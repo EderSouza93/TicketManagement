@@ -16,7 +16,7 @@ export interface Ticket {
     category: string;
     description: string;
     priority: string;
-    status: 'pnding' | 'processing' | 'resolved' | 'closed';
+    status: 'pending' | 'processing' | 'resolved' | 'closed';
     createAt: Date;
     updatedAt: Date;
 }
@@ -28,20 +28,27 @@ export interface FormData {
     description: string;
 }
 
-export interface AvailabilityOverride {
-    id: string;
-    date: string;
-    type: 'holiday' | 'dayoff' | 'lunch' | 'custom';
-    startTime?: string;
-    endTime?: string;
-    description: string;
-}
+// export interface AvailabilityOverride {
+//     id: string;
+//     date: string;
+//     type: 'holiday' | 'dayoff' | 'lunch' | 'custom';
+//     startTime?: string;
+//     endTime?: string;
+//     description: string;
+// }
 
-export interface AvailabilityStatus {
-    isAvailable: boolean;
-    message: string;
-    nextAvailableTime?: string;
-}
+// export interface AvailabilityStatus {
+//     isAvailable: boolean;
+//     message: string;
+//     nextAvailableTime?: string;
+// }
+
+// export interface AvailabilityContextType {
+//     status: AvailabilityStatus;
+//     overrides: AvailabilityOverride[];
+//     addOverride: (override: AvailabilityOverride) => void;
+//     removeOverride: (date: string) => void;
+// }
 
 export interface DiscordWebhookMessage {
     content: string | null;

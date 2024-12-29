@@ -2,7 +2,7 @@ import { Category } from "@/types";
 
 export const CATEGORIES: Category[] = [
     {
-        id: 'systems',
+        id: 'Doubts',
         label: 'Dúvidas sobre sistemas',
         priority: 'média',
         subcategories: [
@@ -43,8 +43,6 @@ export const CATEGORIES: Category[] = [
         subcategories: [
             { id: 'badInformation', label: 'Informação Imprecisa' },
             { id: 'leadTargeting', label: 'Leads redirecionados erroneamente' },
-            { id: 'leadRoulette', label: 'Roleta de Leads' },
-            { id: 'reportBug', label: 'Bug do Sistema'},
             { id: 'others', label: 'Outros' },
         ]
     },
@@ -61,10 +59,10 @@ export const CATEGORIES: Category[] = [
             { id: 'removeUserTakeBlip', label: 'Remoção do Usuário no TakeBlip' },
             { id: 'createUserBoth', label: 'Criação de Usuário no Bitrix e KSI' },
             { id: 'removeUserBoth', label: 'Remoção do Usuário no Bitrix e KSI' },
-            { id: 'permissions', label: 'liberação de acesso no KSI' },
-            { id: 'permissionsBritix', label: 'liberação de acesso no Bitrix' },
-            { id: 'permissionsTakeBlip', label: 'liberação de acesso no TakeBlip' },
-            { id: 'permissionsBoth', label: 'liberação de acesso no Bitrix e KSI' },
+            { id: 'permissions', label: 'Liberação de acesso no KSI' },
+            { id: 'permissionsBritix', label: 'Liberação de acesso no Bitrix' },
+            { id: 'permissionsTakeBlip', label: 'Liberação de acesso no TakeBlip' },
+            { id: 'permissionsBoth', label: 'Liberação de acesso no Bitrix e KSI' },
             { id: 'others', label: 'Outros' },
         ]
     },
@@ -83,13 +81,16 @@ export const CATEGORIES: Category[] = [
 
 export const BUSSINESS_HOURS = {
     start: 8,
-    end: 18,
+    end: 15,
     lunchStart: 12,
     lunchEnd: 14
 };
 
 export const DISCORD_WEBHOOK_COLORS = {
-    available: 0x00ff00,
-    unavailable: 0xff9900,
-    error: 0xff0000
+    available: 0x00ff00,  
+    unavailable: 0xff9900, 
+    error: 0xff0000, 
+    high: 0xff0000, 
+    medium: 0xffff00, 
+    low: 0x00ff00, 
 } as const;

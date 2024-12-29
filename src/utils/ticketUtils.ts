@@ -1,4 +1,4 @@
-
+import { FormData } from "@/types";
 
 export const generateTicketId = (category: string): string => {
     const timestamp = Date.now();
@@ -47,6 +47,6 @@ export const validateTicketData = (data: FormData): string[] => {
     } else if (data.description.length < 10) {
         errors.push('Descrição deve ter pelo menos 10 caracteres');
     }
-        
-    
+      
+    return errors
 } 
