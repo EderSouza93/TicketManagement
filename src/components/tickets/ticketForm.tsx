@@ -1,20 +1,34 @@
-'use client'
+"use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormData, TicketFormProps } from "@/types";
 import { useTicket } from "@/hooks/useTicket";
 import { CATEGORIES } from "@/constants";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { Send } from "lucide-react";
-
+import { useToast } from "@/hooks/use-toast";
+import { ButtonLoading } from "../buttonLoading";
 
 export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
-  const { createTicket } = useTicket()
-  const route = useRouter()
+  const { toast } = useToast();
+  const { createTicket } = useTicket();
+  const route = useRouter();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     category: "",
@@ -36,22 +50,32 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
 
     try {
       const { ticket } = await createTicket(formData);
-      setSuccessMessage(`Chamado criado com sucesso! ID do Ticket: ${ticket.id}`);
-      setFormData({ name: "", category: "", subcategory: "", description: ""});
-      route.push('/ticket/confirmation')
+      setSuccessMessage(
+        `Chamado criado com sucesso! ID do Ticket: ${ticket.id}`
+      );
+      toast({
+        description: `Solicitação enviada com sucesso! ID do Ticket: ${ticket.id}`,
+      });
+      setFormData({ name: "", category: "", subcategory: "", description: "" });
+      route.push(`/ticket/confirmation?ticketId=${ticket.id}`);
     } catch (error) {
       console.error("Erro ao criar chamado:", error);
-      setErrorMessage("Ocorreu um erro ao criar o chamado. Tente novamente.")
+      setErrorMessage("Ocorreu um erro ao criar o chamado. Tente novamente.");
+      toast({
+        variant: "destructive",
+        description: "Ocorreu um erro ao criar o chamado. Tente novamente.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-   
   };
 
   return (
     <Card className={`w-full max-w-2xl mx-auto ${className}`}>
       <CardHeader>
-        <CardTitle>Novo Chamado</CardTitle>
+        <CardTitle className="flex items-center justify-center font-bold text-[#454B60]">
+          Novo Chamado
+        </CardTitle>
         <CardDescription>
           Preencha os dados abaixo para abrir um novo chamado de suporte
         </CardDescription>
@@ -62,17 +86,19 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
             <Input
               required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               placeholder="Nome do solicitante"
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Categoria</label>
-            <Select 
+            <Select
               required
               onValueChange={(value) =>
-                setFormData({ ...formData, category: value, subcategory: ""})
+                setFormData({ ...formData, category: value, subcategory: "" })
               }
               value={formData.category}
             >
@@ -92,15 +118,19 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
           {formData.category && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Subcategoria</label>
-              <Select 
-                onValueChange={(value) => setFormData({ ...formData, subcategory: value })}
+              <Select
+                onValueChange={(value) =>
+                  setFormData({ ...formData, subcategory: value })
+                }
                 value={formData.subcategory}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a subcategoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.find((cat) => cat.id === formData.category)?.subcategories.map((sub) => (
+                  {CATEGORIES.find(
+                    (cat) => cat.id === formData.category
+                  )?.subcategories.map((sub) => (
                     <SelectItem key={sub.id} value={sub.id}>
                       {sub.label}
                     </SelectItem>
@@ -115,16 +145,22 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
             <Textarea
               required
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               placeholder="Descreva detalhadamente o problema ou solicitação"
               className="min-h-32"
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Button type="submit" disabled={isSubmitting}>
+          <div className="flex items-center justify-center">
+            <Button
+              className="bg-[#222872] hover:bg-blue-500"
+              type="submit"
+              disabled={isSubmitting}
+            >
               <Send className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Enviando...": "Enviar"}
+              {isSubmitting ? <ButtonLoading /> : "Enviar"}
             </Button>
           </div>
         </form>

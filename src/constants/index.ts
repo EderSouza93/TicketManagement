@@ -63,6 +63,7 @@ export const CATEGORIES: Category[] = [
             { id: 'permissionsBritix', label: 'Liberação de acesso no Bitrix' },
             { id: 'permissionsTakeBlip', label: 'Liberação de acesso no TakeBlip' },
             { id: 'permissionsBoth', label: 'Liberação de acesso no Bitrix e KSI' },
+            { id: 'createField', label: 'Criação de Campo no Bitrix'},
             { id: 'others', label: 'Outros' },
         ]
     },
