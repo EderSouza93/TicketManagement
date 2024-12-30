@@ -1,14 +1,25 @@
 "use client";
-import React from "react";
+
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ConfirmationPage() {
+  const [ticketId, setTicketId] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const ticketId = searchParams.get("ticketId");
   const router = useRouter();
+
+  useEffect(() => {
+    const id = searchParams.get("ticketId");
+    if (id) {
+      setTicketId(id);
+    } else {
+      // Redireciona ou exibe 404 caso o ticketId não esteja presente
+      router.push("/404");
+    }
+  }, [searchParams, router]);
 
   const handleBackToHome = () => {
     router.push("/");
