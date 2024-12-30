@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { TicketForm } from "@/components/tickets/ticketForm";
+import { TicketForm } from "@/components/ticketForm";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
 export default function Home() {

@@ -10,20 +10,20 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ButtonLoading } from "../buttonLoading";
+import { ButtonLoading } from "@/components/buttonLoading";
 
 export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
   const { toast } = useToast();
