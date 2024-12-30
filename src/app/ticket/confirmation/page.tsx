@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 
-export default function ConfirmationPage() {
+// Suspense Boundary for useSearchParams
+const ConfirmationPageContent = () => {
   const [ticketId, setTicketId] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -50,5 +51,13 @@ export default function ConfirmationPage() {
         </Card>
       </div>
     </main>
+  );
+};
+
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ConfirmationPageContent />
+    </Suspense>
   );
 }
