@@ -82,6 +82,16 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {successMessage && (
+            <div className="bg-green-100 text-green-700 p-4 rounded-md">
+              {successMessage}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="bg-red-100 text-red-700 p-4 rounded-md">
+              {errorMessage}
+            </div>
+          )}
           <div className="space-y-2">
             <Input
               required
