@@ -26,6 +26,7 @@ export interface FormData {
     category: string;
     subcategory: string;
     description: string;
+    files: File[]
 }
 
 // export interface AvailabilityOverride {

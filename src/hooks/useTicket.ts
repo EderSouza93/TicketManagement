@@ -29,6 +29,7 @@ export const useTicket = () => {
         category: string;
         subcategory?: string;
         description: string;
+        files?: File[]
     }): Promise<{ success: boolean; ticket: Ticket}> => {
         
 
@@ -52,7 +53,7 @@ export const useTicket = () => {
         };
 
         const webhookMessage: DiscordWebhookMessage = {
-            content: `Novo Chamado Criado`,
+            content: `Novo Chamado Criado de ${formData.name}`,
             embeds: [
                 {
                     title: "Detalhes do Chamado",
@@ -75,7 +76,7 @@ export const useTicket = () => {
             ],
         };
 
-        const success = await sendWebhook(webhookMessage);
+        const success = await sendWebhook(webhookMessage, formData.files || []);
 
         return { success, ticket };
     };
