@@ -26,7 +26,7 @@ export const CATEGORIES: Category[] = [
     },
     {
         id: 'technical-KSI',
-        label: 'Problemas técnicos com Ksi',
+        label: 'Problemas técnicos com KSI',
         priority: 'alta',
         subcategories: [
             { id: 'leadLose', label: 'Lead Perdido' },
@@ -77,6 +77,15 @@ export const CATEGORIES: Category[] = [
             { id: 'process', label: 'Melhoria em Processo' },
             { id: 'interface', label: 'Interface/Usabilidade' }
         ]
+    },
+    {
+        id: 'brokersLeague',
+        label: 'Envios Liga',
+        priority: 'baixa',
+        subcategories: [
+            { id: 'GoogleReviews', label: 'Avaliações do Google'},
+            { id: 'InstagramReels', label: 'Reels do Instagram'},
+        ]
     }
 ];
 
@@ -91,7 +100,4 @@ export const DISCORD_WEBHOOK_COLORS = {
     available: 0x00ff00,  
     unavailable: 0xff9900, 
     error: 0xff0000, 
-    high: 0xff0000, 
-    medium: 0xffff00, 
-    low: 0x00ff00, 
 } as const;

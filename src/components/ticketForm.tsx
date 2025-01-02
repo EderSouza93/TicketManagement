@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
@@ -21,59 +22,120 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { validateFiles } from "@/utils/fileValidation";
 import { ButtonLoading } from "@/components/buttonLoading";
 
 export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
   const { toast } = useToast();
   const { createTicket } = useTicket();
   const route = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     category: "",
     subcategory: "",
     description: "",
+    files: [],
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
 
-  // Manipula o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setIsSubmitting(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
+    if (
+      formData.category === "brokersLeague" &&
+      (!formData.files || formData.files.length === 0)
+    ) {
+      toast({
+        variant: "destructive",
+        title: "Erro no envio",
+        description: "É obrigatório anexar arquivos para esta categoria.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const { ticket } = await createTicket(formData);
-      setSuccessMessage(
-        `Chamado criado com sucesso! ID do Ticket: ${ticket.id}`
-      );
-      toast({
-        description: `Solicitação enviada com sucesso! ID do Ticket: ${ticket.id}`,
-      });
-      setFormData({ name: "", category: "", subcategory: "", description: "" });
-      route.push(`/ticket/confirmation?ticketId=${ticket.id}`);
+      
+        setFeedbackMessage({
+          success: true,
+          message: `Chamado criado com sucesso! ID: ${ticket.id}`,
+        });
+
+        toast({
+          description: `Solicitação enviada com sucesso! ID: ${ticket.id}`,
+        });
+        
+        setIsLoading(true);
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        route.push(`/ticket/confirmation?ticketId=${ticket.id}`);
+      
     } catch (error) {
       console.error("Erro ao criar chamado:", error);
-      setErrorMessage("Ocorreu um erro ao criar o chamado. Tente novamente.");
+      setFeedbackMessage({
+        success: false,
+        message: "Ocorreu um erro ao criar o chamado. Tente novamente.",
+      });
       toast({
         variant: "destructive",
         description: "Ocorreu um erro ao criar o chamado. Tente novamente.",
       });
-    } finally {
-      setIsSubmitting(false);
+    } 
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const maxFiles = 10;
+    const maxTotalSize = 8 * 1024 * 1024; // 8 MB
+    const currentFilesCount = formData.files.length;
+
+    const validation = validateFiles(
+      files,
+      maxTotalSize,
+      maxFiles,
+      currentFilesCount
+    );
+
+    if (!validation.isValid) {
+      toast({
+        variant: "destructive",
+        title: "Ops! Não é possível enviar esses anexos",
+        description: validation.errorMessage,
+      });
+      return; // Impede a execução do restante da função
     }
+
+    setFormData({
+      ...formData,
+      files: [...formData.files, ...validation.validFiles!],
+    });
   };
 
   return (
-    <Card className={`w-full max-w-2xl mx-auto ${className}`}>
+    <>
+    {isLoading && (
+      <div className="fixed inset-0 bg-black/50 blackdrop-blur-sm flex items-center justify-center z-50">
+        <div className="flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-20 w-20 text-white animate-spin" />
+        </div>
+      </div>
+    )
+    }
+    <Card className={`w-full max-w-2xl mx-auto ${className} ${isLoading ? "pointer-events-none opacity-0" : ""}`}>
       <CardHeader>
-        <CardTitle className="flex items-center justify-center font-bold text-[#454B60]">
+        <CardTitle className="flex items-center justify-center mt-4 font-bold text-[#454B60]">
           Novo Chamado
         </CardTitle>
         <CardDescription>
@@ -82,19 +144,22 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {successMessage && (
-            <div className="bg-green-100 text-green-700 p-4 rounded-md">
-              {successMessage}
+          {feedbackMessage && (
+            <div
+              className={`p-4 rounded-md ${
+                feedbackMessage.success
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {feedbackMessage.message}
             </div>
           )}
-          {errorMessage && (
-            <div className="bg-red-100 text-red-700 p-4 rounded-md">
-              {errorMessage}
-            </div>
-          )}
+          {/* Nome */}
           <div className="space-y-2">
             <Input
               required
+              className="bg-[#F2F6FA] border-none"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -102,9 +167,9 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
               placeholder="Nome do solicitante"
             />
           </div>
-
+          {/* Categoria */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Categoria</label>
+            <Label>Categoria</Label>
             <Select
               required
               onValueChange={(value) =>
@@ -112,10 +177,10 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
               }
               value={formData.category}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-[#F2F6FA] border-none">
                 <SelectValue placeholder="Selecione a categoria" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="text-[#454B60]">
                 {CATEGORIES.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>
                     {cat.label}
@@ -124,7 +189,7 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
               </SelectContent>
             </Select>
           </div>
-
+          {/* Subcategoria */}
           {formData.category && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Subcategoria</label>
@@ -134,7 +199,7 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
                 }
                 value={formData.subcategory}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-[#F2F6FA] border-none">
                   <SelectValue placeholder="Selecione a subcategoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,9 +214,9 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
               </Select>
             </div>
           )}
-
+          {/* Descrição */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Descrição</label>
+            <Label>Descrição</Label>
             <Textarea
               required
               value={formData.description}
@@ -161,11 +226,23 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
               placeholder="Descreva detalhadamente o problema ou solicitação"
               className="min-h-32"
             />
+            {/* Upload de Arquivos */}
+            <Label htmlFor="picture">Enviar Foto</Label>
+            <Input
+              className="bg-[#F2F6FA] border-none cursor-pointer"
+              id="picture"
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              multiple
+              onChange={handleFileChange}
+            />
+            <p className="text-center text-xs text-red-500">
+              Envie até 10 arquivos, com no máximo 8MB cada</p>
           </div>
-
+              {/* Button */}
           <div className="flex items-center justify-center">
             <Button
-              className="bg-[#222872] hover:bg-blue-500"
+              className="bg-[#222872] hover:bg-blue-500 hover:scale-110"
               type="submit"
               disabled={isSubmitting}
             >
@@ -176,5 +253,6 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
         </form>
       </CardContent>
     </Card>
-  );
+    </>
+    );
 };
