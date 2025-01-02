@@ -42,7 +42,7 @@ const ConfirmationPageContent = () => {
           </CardDescription>
           <div className="flex items-end justify-center">
             <Button
-              className="bg-[#222872] hover:bg-blue-500"
+              className="bg-[#222872] hover:bg-blue-500 hover:scale-110"
               onClick={handleBackToHome}
             >
               Voltar para a Página Inicial

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { validateFiles } from "@/utils/fileValidation";
 import { ButtonLoading } from "@/components/buttonLoading";
@@ -31,6 +31,8 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
   const { toast } = useToast();
   const { createTicket } = useTicket();
   const route = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     category: "",
@@ -40,53 +42,100 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState<{ success: boolean; message: string } | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
 
-  const resetForm = () => {
-    setFormData({ name: "", category: "", subcategory: "", description: "", files: [] });
-  };
-
-  // Manipula o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setFeedbackMessage(null)
-    
+
+    if (
+      formData.category === "brokersLeague" &&
+      (!formData.files || formData.files.length === 0)
+    ) {
+      toast({
+        variant: "destructive",
+        title: "Erro no envio",
+        description: "É obrigatório anexar arquivos para esta categoria.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const { ticket } = await createTicket(formData);
-      setFeedbackMessage({ success: true, message: `Chamado criado com sucesso! ID: ${ticket.id}` });
-      toast({ description: `Solicitação enviada com sucesso! ID: ${ticket.id}` });
-      resetForm()
-      route.push(`/ticket/confirmation?ticketId=${ticket.id}`);
+      
+        setFeedbackMessage({
+          success: true,
+          message: `Chamado criado com sucesso! ID: ${ticket.id}`,
+        });
+
+        toast({
+          description: `Solicitação enviada com sucesso! ID: ${ticket.id}`,
+        });
+        
+        setIsLoading(true);
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        route.push(`/ticket/confirmation?ticketId=${ticket.id}`);
+      
     } catch (error) {
       console.error("Erro ao criar chamado:", error);
-      setFeedbackMessage({ success: false, message: "Ocorreu um erro ao criar o chamado. Tente novamente."});
-      toast({ variant: "destructive", description: "Ocorreu um erro ao criar o chamado. Tente novamente.",});
-    } finally {
-      setIsSubmitting(false);
-    }
+      setFeedbackMessage({
+        success: false,
+        message: "Ocorreu um erro ao criar o chamado. Tente novamente.",
+      });
+      toast({
+        variant: "destructive",
+        description: "Ocorreu um erro ao criar o chamado. Tente novamente.",
+      });
+    } 
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if(!files) return;
+    if (!files) return;
 
-    const { isValid, errorMessage, validFiles } = validateFiles(files, 8 * 1024 * 1024);
-    if (!isValid) {
-      toast({ variant: "destructive", title: "Erro no upload do arquivo", description: errorMessage });
-      return
+    const maxFiles = 10;
+    const maxTotalSize = 8 * 1024 * 1024; // 8 MB
+    const currentFilesCount = formData.files.length;
+
+    const validation = validateFiles(
+      files,
+      maxTotalSize,
+      maxFiles,
+      currentFilesCount
+    );
+
+    if (!validation.isValid) {
+      toast({
+        variant: "destructive",
+        title: "Ops! Não é possível enviar esses anexos",
+        description: validation.errorMessage,
+      });
+      return; // Impede a execução do restante da função
     }
 
-    setFormData({ ...formData, files: validFiles || []});
-  }
-
-
+    setFormData({
+      ...formData,
+      files: [...formData.files, ...validation.validFiles!],
+    });
+  };
 
   return (
-    <Card className={`w-full max-w-2xl mx-auto ${className}`}>
+    <>
+    {isLoading && (
+      <div className="fixed inset-0 bg-black/50 blackdrop-blur-sm flex items-center justify-center z-50">
+        <div className="flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-20 w-20 text-white animate-spin" />
+        </div>
+      </div>
+    )
+    }
+    <Card className={`w-full max-w-2xl mx-auto ${className} ${isLoading ? "pointer-events-none opacity-0" : ""}`}>
       <CardHeader>
-        <CardTitle className="flex items-center justify-center font-bold text-[#454B60]">
+        <CardTitle className="flex items-center justify-center mt-4 font-bold text-[#454B60]">
           Novo Chamado
         </CardTitle>
         <CardDescription>
@@ -96,9 +145,12 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {feedbackMessage && (
-            <div className={`p-4 rounded-md ${
-            feedbackMessage.success ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700" 
-            }`}
+            <div
+              className={`p-4 rounded-md ${
+                feedbackMessage.success
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
             >
               {feedbackMessage.message}
             </div>
@@ -115,8 +167,7 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
               placeholder="Nome do solicitante"
             />
           </div>
-
-          {/* Categoria  */}
+          {/* Categoria */}
           <div className="space-y-2">
             <Label>Categoria</Label>
             <Select
@@ -148,7 +199,7 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
                 }
                 value={formData.subcategory}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-[#F2F6FA] border-none">
                   <SelectValue placeholder="Selecione a subcategoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,18 +228,21 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
             />
             {/* Upload de Arquivos */}
             <Label htmlFor="picture">Enviar Foto</Label>
-            <Input 
-            id="picture" 
-            type="file"
-            accept=".jpg,.jpeg,.png"
-            multiple
-            onChange={handleFileChange}
+            <Input
+              className="bg-[#F2F6FA] border-none cursor-pointer"
+              id="picture"
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              multiple
+              onChange={handleFileChange}
             />
+            <p className="text-center text-xs text-red-500">
+              Envie até 10 arquivos, com no máximo 8MB cada</p>
           </div>
-
+              {/* Button */}
           <div className="flex items-center justify-center">
             <Button
-              className="bg-[#222872] hover:bg-blue-500"
+              className="bg-[#222872] hover:bg-blue-500 hover:scale-110"
               type="submit"
               disabled={isSubmitting}
             >
@@ -199,5 +253,6 @@ export const TicketForm: React.FC<TicketFormProps> = ({ className }) => {
         </form>
       </CardContent>
     </Card>
-  );
+    </>
+    );
 };
