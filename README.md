@@ -27,6 +27,14 @@ Este projeto é um MVP (Minimum Viable Product) de um sistema de chamados e dema
 4. **Indicação de Disponibilidade**:
    - **Nota:** Esta funcionalidade será implementada em versões futuras, juntamente com a criação de um backend.
 
+5. **Screeshot de Telas**:
+   ![image](https://github.com/user-attachments/assets/2e39c9dd-2363-46d7-8081-15dfc779d0e4)
+   ![image](https://github.com/user-attachments/assets/a7ee7b75-6bd3-4e96-b099-281911b58948)
+   ![TicketManagment3](https://github.com/user-attachments/assets/4d29ff4c-8e05-4dca-bbad-25b3f8bf9a3c)
+   ![TicketManagment4](https://github.com/user-attachments/assets/a3bb02da-4b4f-4c79-9b2b-db3ce27b852e)
+
+
+
 ## Estrutura do Projeto
 
 ```
