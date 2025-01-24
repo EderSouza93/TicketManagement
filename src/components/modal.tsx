@@ -27,7 +27,7 @@ export const WarningModal: React.FC<WarningModalProps> = ({
               </p>
               <ul className="list-disc pl-4 space-y-2">
                 <li>Melhoria no design e navegação</li>
-                <li>Adição da funconalidade de envio de fotos</li>
+                <li>Adição da funcionalidade de envio de fotos</li>
                 <li>Para os corretores agora é possivel enviar os prints das avaliações e reels para liga</li>
               </ul>
           </CardDescription>
