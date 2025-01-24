@@ -11,11 +11,22 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
+    const modalSeen = localStorage.getItem("modalSeen");
+
+    if (!modalSeen) {
+      setTimeout(() => {
+        setLoading(false);
+        setShowModal(true);
+      }, 2000);
+    } else {
       setLoading(false);
-      setShowModal(true);
-    }, 2000);
+    } 
   }, []);
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    localStorage.setItem("modalSeen", "true");
+  }
 
   const LoadingScreen = () => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -27,7 +38,7 @@ export default function Home() {
   return (
     <BackgroundLayout>
       {isLoading && <LoadingScreen />}
-      <WarningModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <WarningModal isOpen={showModal} onClose={handleModalClose} />
       <main className={`flex flex-col items-center justify-center mx-auto py-8 px-4 ${showModal ? 'blur-sm' : ''}`} >
         <Image
           alt='Logo'
