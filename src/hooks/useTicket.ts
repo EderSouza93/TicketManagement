@@ -1,4 +1,4 @@
-import { DiscordWebhookMessage, TicketPriority, Ticket } from "@/types";
+import { DiscordWebhookMessage, TicketPriority, Ticket,  } from "@/types";
 import { CATEGORIES } from "@/constants";
 import { useDiscordWebhook } from "./useDiscordWebhookMessage";
 
@@ -17,6 +17,7 @@ export const useTicket = () => {
                 return 0x808080;
         }
     };
+
 
     const generateCustomId = (): string => {
         const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -48,7 +49,7 @@ export const useTicket = () => {
             description: formData.description,
             priority: selectedCategory.priority,
             status: "pending",
-            createAt: new Date(),
+            createdAt: new Date(),
             updatedAt: new Date(),
         };
 

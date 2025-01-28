@@ -14,39 +14,67 @@ datasource db {
 }
 
 model Category {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  label          String
-  priority       TicketPriority
-  subcategories  Subcategory[]
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  label        String
+  priority     Priority
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  subcategories Subcategory[]
+  tickets      Ticket[]     @relation("CategoryTickets")
+
+  @@map("categories")
 }
 
 model Subcategory {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  label  String
-  parent Category @relation(fields: [categoryId], references: [id])
-  categoryId String @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  label      String
+  categoryId String    @db.ObjectId
+  category   Category  @relation(fields: [categoryId], references: [id])
+  tickets    Ticket[]  @relation("SubcategoryTickets")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("subcategories")
 }
 
 model Ticket {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  category    String
-  description String
-  priority    TicketPriority
-  status      TicketStatus
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String
+  priority      Priority
+  status        Status      @default(PENDING)
+  categoryId    String      @db.ObjectId
+  category      Category    @relation("CategoryTickets", fields: [categoryId], references: [id])
+  subcategoryId String      @db.ObjectId
+  subcategory   Subcategory @relation("SubcategoryTickets", fields: [subcategoryId], references: [id])
+  files         File[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("tickets")
 }
 
-enum TicketPriority {
-  baixa
-  média
-  alta
+model File {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  url       String
+  ticketId  String   @db.ObjectId
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("files")
 }
 
-enum TicketStatus {
-  pending
-  processing
-  resolved
-  closed
+enum Priority {
+  BAIXA
+  MEDIA
+  ALTA
+}
+
+enum Status {
+  PENDING
+  PROCESSING
+  RESOLVED
+  CLOSED
 }
