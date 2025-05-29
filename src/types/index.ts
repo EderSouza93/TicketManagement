@@ -1,80 +1,36 @@
-export type Priority = 'baixa' | 'média' | 'alta';
-export type Status = 'pending' | 'processing' | 'resolved' | 'closed';
-
-export interface Category {
-    id: string;
-    label: string;
-    priority: Priority;
-    subcategories: Subcategory[];
-}
-
-export interface Subcategory {
-    id: string;
-    label: string;
-}
-
-export interface Ticket {
-    id: string;
+export interface User {
+    id: number;
     name: string;
-    category: string;
-    description: string;
-    priority: Priority;
-    status: Status;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface FormData {
+    email: string;
+  }
+  export interface UserToken {
+    id: number;
+    token: string;
+    user_id: number;
+  }
+  export interface Category {
+    id: number;
+    label: string;
+    priority: 'High' | 'Medium' | 'Low';
+  }
+  export interface Subcategory {
+    id: number;
+    label: string;
+    category_id: number;
+  }
+  export interface Requester {
+    id: number;
     name: string;
-    category: string;
-    subcategory: string;
+    email: string;
+    phone: string;
+  }
+  export interface Ticket {
+    id: number;
     description: string;
-    files: File[]
-}
-
-export interface TicketFormProps {
-    onSubmit?: (ticket: Omit<Ticket, 'id' | 'status' | 'createdAt' | 'updatedAt'>) => Promise<void>;
-    className?: string;
-}
-
-export interface TicketConfirmationProps {
-    ticketId: string;
-    isAvailable: boolean;
-    nextAvailableTime?: string;
-}
-
-export interface DiscordWebhookMessage {
-    content: string | null;
-    embeds: Array<{
-        title: string;
-        color: number;
-        fields: Array<{
-            name: string;
-            value: string;
-            inline?: boolean;
-        }>;
-    }>;
-}
-
-export interface ApiError {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-}
-
-export interface AvailabilityAdminProps {
-    classname?: string;
-}
-
-export enum TicketPriority {
-    LOW = 'baixa',
-    MEDIUM = 'média',
-    HIGH = 'alta'
-}
-
-export enum TicketStatus {
-    PENDING = 'pending',
-    PROCESSING = 'processing',
-    RESOLVED = 'resolved',
-    CLOSED = 'closed'
-}
+    requester_id: number;
+    subcategory_id: number;
+    user_id?: number;   
+    status: string;
+    created_at: string;
+    updated_at: string;
+  }
